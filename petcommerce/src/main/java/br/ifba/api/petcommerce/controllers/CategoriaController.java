@@ -1,5 +1,6 @@
 package br.ifba.api.petcommerce.controllers;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.ifba.api.petcommerce.dtos.request.CategoriaRequestDTO;
 import br.ifba.api.petcommerce.dtos.response.CategoriaResponseDTO;
@@ -34,37 +36,31 @@ public class CategoriaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> buscarPorId(@PathVariable Long id) {
-        try {
-            CategoriaResponseDTO categoria = categoriaService.buscarPorId(id);
-            return ResponseEntity.ok(categoria);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        CategoriaResponseDTO categoria = categoriaService.buscarPorId(id);
+        return ResponseEntity.ok(categoria);
     }
 
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> salvar(@RequestBody CategoriaRequestDTO requestDTO) {
         CategoriaResponseDTO novaCategoria = categoriaService.salvar(requestDTO);
-        return ResponseEntity.ok(novaCategoria);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(novaCategoria.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(novaCategoria);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> atualizar(@PathVariable Long id, @RequestBody CategoriaRequestDTO requestDTO) {
-        try {
-            CategoriaResponseDTO categoriaAtualizada = categoriaService.atualizar(id, requestDTO);
-            return ResponseEntity.ok(categoriaAtualizada);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        CategoriaResponseDTO categoriaAtualizada = categoriaService.atualizar(id, requestDTO);
+        return ResponseEntity.ok(categoriaAtualizada);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        try {
-            categoriaService.excluir(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        categoriaService.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 }
