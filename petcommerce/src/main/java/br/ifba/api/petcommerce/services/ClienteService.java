@@ -16,10 +16,12 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
+    private final EnderecoService enderecoService;
 
-    public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
+    public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper, EnderecoService enderecoService) {
         this.clienteRepository = clienteRepository;
         this.clienteMapper = clienteMapper;
+        this.enderecoService = enderecoService;
     }
 
     public List<ClienteResponseDTO> listarTodos() {
@@ -42,4 +44,27 @@ public class ClienteService {
 
         return clienteMapper.toResponseDTO(novoCliente);
     }
+    
+    public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO requestDTO){
+        Cliente cliente = clienteRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Cliente não encontrado com o ID: " + id));
+            
+            cliente.setNome(requestDTO.getNome());
+            cliente.setEmail(requestDTO.getEmail());
+            cliente.setTelefone(requestDTO.getTelefone());
+            if (cliente.getEndereco() != null) {
+                cliente.setEndereco(enderecoService.atualizarEndereco(cliente.getEndereco(), requestDTO.getEndereco()));
+            }
+
+            Cliente clienteAtualizado = clienteRepository.save(cliente);
+            return clienteMapper.toResponseDTO(clienteAtualizado);
+    }
+
+    public void excluir(Long id){
+        if(!clienteRepository.existsById(id)){
+            throw new RuntimeException("Cliente não encontrado com o ID: " + id);
+        }
+        clienteRepository.deleteById(id);
+    }
+
 }
