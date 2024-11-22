@@ -10,6 +10,25 @@ import br.ifba.api.petcommerce.entities.Cliente;
 @Component
 public class ClienteMapper {
 
+    public Cliente toEntity(ClienteRequestDTO requestDTO) {
+        Cliente cliente = new Cliente();
+        cliente.setNome(requestDTO.getNome());
+        cliente.setEmail(requestDTO.getEmail());
+        cliente.setTelefone(requestDTO.getTelefone());
+
+        if (requestDTO.getEndereco() != null) {
+            cliente.setEndereco(new br.ifba.api.petcommerce.entities.Endereco(
+                requestDTO.getEndereco().getRua(),
+                requestDTO.getEndereco().getNumero(),
+                requestDTO.getEndereco().getCidade(),
+                requestDTO.getEndereco().getEstado(),
+                requestDTO.getEndereco().getCep()
+            ));
+        }
+
+        return cliente;
+    }
+
     public ClienteResponseDTO toResponseDTO(Cliente cliente) {
         ClienteResponseDTO responseDTO = new ClienteResponseDTO();
         responseDTO.setId(cliente.getId());
@@ -29,23 +48,5 @@ public class ClienteMapper {
 
         return responseDTO;
     }
-
-    public Cliente toEntity(ClienteRequestDTO requestDTO) {
-        Cliente cliente = new Cliente();
-        cliente.setNome(requestDTO.getNome());
-        cliente.setEmail(requestDTO.getEmail());
-        cliente.setTelefone(requestDTO.getTelefone());
-
-        if (requestDTO.getEndereco() != null) {
-            cliente.setEndereco(new br.ifba.api.petcommerce.entities.Endereco(
-                requestDTO.getEndereco().getRua(),
-                requestDTO.getEndereco().getNumero(),
-                requestDTO.getEndereco().getCidade(),
-                requestDTO.getEndereco().getEstado(),
-                requestDTO.getEndereco().getCep()
-            ));
-        }
-
-        return cliente;
-    }
 }
+
